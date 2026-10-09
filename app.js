@@ -307,7 +307,7 @@ $("import-file").addEventListener("change", e => {
 /* ---------- init ---------- */
 async function init() {
   load();
-  if (!localStorage.getItem("editing-ledger-seeded")) {
+  if (!localStorage.getItem("editing-ledger-seeded-v2")) {
     try {
       const r = await fetch("seed.json");
       if (r.ok) {
@@ -316,7 +316,7 @@ async function init() {
         save();
       }
     } catch (e) { /* offline or no seed — start empty */ }
-    try { localStorage.setItem("editing-ledger-seeded", "1"); } catch (e) {}
+    try { localStorage.setItem("editing-ledger-seeded-v2", "1"); } catch (e) {}
   }
   render();
 }
