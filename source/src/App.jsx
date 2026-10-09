@@ -5,6 +5,7 @@ import LedgerTable from "./components/LedgerTable";
 import Kanban from "./components/Kanban";
 import Analytics from "./components/Analytics";
 import VideoModal from "./components/VideoModal";
+import ConfirmDialog from "./components/ConfirmDialog";
 import CommandPalette from "./components/CommandPalette";
 import { loadVideos, loadSeed, saveVideos, stats } from "./lib/ledger";
 
@@ -13,6 +14,7 @@ export default function App() {
   const [ready, setReady] = useState(!!loadVideos());
   const [view, setView] = useState("overview");
   const [modal, setModal] = useState(null); // {video?}
+  const [confirmDelete, setConfirmDelete] = useState(null);
   const [palette, setPalette] = useState(false);
   const fileRef = useRef(null);
 
@@ -38,10 +40,12 @@ export default function App() {
     setModal(null);
   }, []);
 
-  const deleteVideo = useCallback((v) => {
-    if (!window.confirm(`Delete "${v.name || "Untitled"}"?`)) return;
-    setVideos((vs) => vs.filter((x) => x.id !== v.id));
-  }, []);
+  const deleteVideo = useCallback((v) => setConfirmDelete(v), []);
+
+  const confirmDeleteVideo = useCallback(() => {
+    setVideos((vs) => vs.filter((x) => x.id !== confirmDelete.id));
+    setConfirmDelete(null);
+  }, [confirmDelete]);
 
   const moveVideo = useCallback((id, status) => {
     setVideos((vs) => vs.map((v) => (v.id === id ? { ...v, status } : v)));
@@ -122,6 +126,14 @@ export default function App() {
       </nav>
 
       {modal && <VideoModal video={modal.video} onClose={() => setModal(null)} onSave={saveVideo} />}
+      {confirmDelete && (
+        <ConfirmDialog
+          title="Delete video?"
+          message={`"${confirmDelete.name || "Untitled"}" will be permanently removed from your ledger.`}
+          onCancel={() => setConfirmDelete(null)}
+          onConfirm={confirmDeleteVideo}
+        />
+      )}
       {palette && (
         <CommandPalette videos={videos} onClose={() => setPalette(false)} onAction={onPaletteAction} />
       )}
