@@ -305,5 +305,15 @@ $("import-file").addEventListener("change", e => {
 });
 
 /* ---------- init ---------- */
-load();
-render();
+async function init() {
+  load();
+  if (!localStorage.getItem("editing-ledger-seeded")) {
+    try {
+      const r = await fetch("seed.json");
+      if (r.ok) { videos = await r.json(); save(); }
+    } catch (e) { /* offline or no seed — start empty */ }
+    try { localStorage.setItem("editing-ledger-seeded", "1"); } catch (e) {}
+  }
+  render();
+}
+init();
