@@ -1,7 +1,8 @@
 # Editing Ledger
 
-A minimal, modern editing income tracker — a self-hosted replacement for the Notion ledger.
-Static site, no backend. Deploy free on GitHub Pages.
+A premium editing income tracker — React + Vite, deployed as a static site on GitHub Pages.
+
+Live: https://drissxdxrk.github.io/editing-ledger/
 
 ## Rates (baked in)
 
@@ -11,27 +12,25 @@ Static site, no backend. Deploy free on GitHub Pages.
 
 ## Features
 
-- Ledger table with your exact column order (name → type → status → min/sec/ms → date finished → income → earned → month → this month)
-- Pipeline kanban (Todo → In Progress → Review → Completed)
-- Analytics: earned income by month + reel/YouTube breakdown
-- Search, month and type filters
-- Data persists in the browser (localStorage) + one-click JSON export/import for backup
+- **Overview** — animated stat cards, revenue-by-month chart, recent videos
+- **Ledger** — sortable/filterable table, search, edit, delete
+- **Pipeline** — kanban with drag & drop between stages
+- **Analytics** — monthly earned bars, format-split donut, breakdown ratios
+- **Command palette** — `Ctrl/⌘+K` for commands and video search, `N` for new video
+- Data persists in browser localStorage; JSON export/import for backup
 
-## Put it on GitHub Pages
+## Repo layout
+
+- `/` — built site (what GitHub Pages serves). **Do not edit by hand.**
+- `/source` — the Vite + React source. Edit here, then rebuild.
+- `/seed.json` — first-run seed data (empty by default).
+
+## Development
 
 ```bash
-cd editing-tracker
-git init
-git add .
-git commit -m "Editing ledger"
-gh repo create editing-ledger --public --source=. --push
+cd source
+npm install
+npm run dev      # local dev server
+npm run build    # outputs to source/dist
+# then copy source/dist/* to the repo root and push
 ```
-
-Then in the repo: **Settings → Pages → Deploy from a branch → main / root**.
-Your site will be live at `https://<your-username>.github.io/editing-ledger/`.
-
-## Notes
-
-- Data lives in each browser's localStorage — it does not sync between devices.
-  Use **Export** regularly and **Import** the backup on your other device.
-- No logins, no tracking, no dependencies beyond Google Fonts (graceful offline fallback).
