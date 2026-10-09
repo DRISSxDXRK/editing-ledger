@@ -4,6 +4,10 @@ A premium editing income tracker — React + Vite, deployed as a static site on 
 
 Live: https://drissxdxrk.github.io/editing-ledger/
 
+> Build note: the app is written in 100% React, but Vite aliases React to
+> Preact (React-compatible API) at build time, shrinking the JS bundle from
+> ~250KB to ~45KB for instant loads. See `source/vite.config.js`.
+
 ## Rates (baked in)
 
 - **Reel:** $10 flat
