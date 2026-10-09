@@ -304,16 +304,42 @@ $("import-file").addEventListener("change", e => {
   e.target.value = "";
 });
 
-/* ---------- init ---------- */
+/* ---------- init: live sync from Notion (via seed.json) ---------- */
+function hashStr(s) {
+  let h = 5381;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) >>> 0;
+  return h.toString(36);
+}
+function renderSyncBadge() {
+  const el = $("sync-badge");
+  if (!el) return;
+  try {
+    const raw = localStorage.getItem("editing-ledger-synced-at");
+    el.textContent = raw ? "Synced from Notion · " + new Date(raw).toLocaleString() : "Local data";
+  } catch (e) { el.textContent = "Local data"; }
+}
 async function init() {
   load();
-  if (!localStorage.getItem("editing-ledger-seeded")) {
-    try {
-      const r = await fetch("seed.json");
-      if (r.ok) { videos = await r.json(); save(); }
-    } catch (e) { /* offline or no seed — start empty */ }
-    try { localStorage.setItem("editing-ledger-seeded", "1"); } catch (e) {}
-  }
+  // Notion is the source of truth: whenever seed.json changes, it wins.
+  try {
+    const r = await fetch("seed.json", { cache: "no-store" });
+    if (r.ok) {
+      const txt = await r.text();
+      if (localStorage.getItem("editing-ledger-seed-hash") !== hashStr(txt)) {
+        const data = JSON.parse(txt);
+        const arr = Array.isArray(data) ? data : (data.videos || []);
+        videos = arr;
+        save();
+        try {
+          localStorage.setItem("editing-ledger-seed-hash", hashStr(txt));
+          localStorage.removeItem("editing-ledger-seeded");
+          if (!Array.isArray(data) && data.syncedAt)
+            localStorage.setItem("editing-ledger-synced-at", data.syncedAt);
+        } catch (e) {}
+      }
+    }
+  } catch (e) { /* offline — keep local data */ }
   render();
+  renderSyncBadge();
 }
 init();
